@@ -3,19 +3,20 @@ from urllib import request
 import sqlite3
 
 # Connect to a table and cursor
-conn = sqlite3.connect('test_db.db')
+conn = sqlite3.connect('database.db')
 cur = conn.cursor()
 
 # Create a table
-# cur.executescript('''
-#     DROP TABLE IF EXISTS vnexpress;
-#     CREATE TABLE vnexpress (
-#         id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
-#         date TEXT,
-#         title TEXT UNIQUE,
-#         link TEXT UNIQUE
-#     )
-# ''')
+cur.executescript('''
+    DROP TABLE IF EXISTS vnexpress;
+    CREATE TABLE vnexpress (
+        id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
+        date TEXT,
+        title TEXT UNIQUE,
+        link TEXT UNIQUE,
+        description TEXT
+    )
+''')
 
 def get_data(url):
     # Get the links to webpags and pass them to BeautifulSoup
@@ -32,13 +33,16 @@ def get_data(url):
             link = article.get('href')
             # Get the date of the new article
             post_date = new_feed.find('div', class_='timer_post').text.strip().split('|')[0]
+            # Get the description of the new article
+            descr = new_feed.find('div', class_='lead_news_site').find('a').text.strip()
         except AttributeError:
             pass
+        # print(f'DATE: {post_date}')
         # print(f'TITLE: {title}')
         # print(f'LINK: {link}')
-        # print(f'DATE: {post_date}')
+        # print(f'DESCRIPTION : {descr}')
         # print('====================')
-        cur.execute('''INSERT OR IGNORE INTO vnexpress (date, title, link) VALUES (?, ?, ?)''', (post_date, title, link))
+        cur.execute('''INSERT OR IGNORE INTO vnexpress (date, title, link, description) VALUES (?, ?, ?, ?)''', (post_date, title, link, descr))
         # Save data to the table
         conn.commit()
 

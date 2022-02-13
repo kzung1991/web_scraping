@@ -1,6 +1,7 @@
 from bs4 import BeautifulSoup
 from urllib import request
 import sqlite3
+from dateutil import parser # for working with datetime
 
 # Connect to a table and cursor
 conn = sqlite3.connect('database.db')
@@ -13,7 +14,7 @@ cur.executescript('''
         id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
         date TEXT,
         title TEXT UNIQUE,
-        link TEXT UNIQUE,
+        link TEXT,
         description TEXT
     )
 ''')
@@ -33,6 +34,9 @@ def get_data(url):
             link = article.get('href')
             # Get the date of the new article
             post_date = new_feed.find('div', class_='timer_post').text.strip().split('|')[0]
+            # Convert string date to datetime datatype
+            post_date = ''.join(post_date.split(',')).strip()
+            post_date = str(parser.parse(post_date).date())
             # Get the description of the new article
             descr = new_feed.find('div', class_='lead_news_site').find('a').text.strip()
         except AttributeError:
@@ -46,11 +50,12 @@ def get_data(url):
         # Save data to the table
         conn.commit()
 
-subjects = ['travel', 'sports', 'life', 'business', 'news', 'world', 'trend', 'style', 'culture', 'economy', 'places']
-for subject in subjects:
-    url = f'https://e.vnexpress.net/news/{subject}'
-    get_data(url)
+if __name__ == '__main__':
+    subjects = ['travel', 'sports', 'life', 'business', 'news', 'world', 'trend', 'style', 'culture', 'economy', 'places']
+    for subject in subjects:
+        url = f'https://e.vnexpress.net/news/{subject}'
+        get_data(url)
 
-# Close cursor and disconnect to the database
-cur.close()
-conn.close()
+    # Close cursor and disconnect to the database
+    cur.close()
+    conn.close()

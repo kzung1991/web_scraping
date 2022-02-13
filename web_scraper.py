@@ -7,17 +7,17 @@ from dateutil import parser # for working with datetime
 conn = sqlite3.connect('database.db')
 cur = conn.cursor()
 
-# Create a table
-cur.executescript('''
-    DROP TABLE IF EXISTS vnexpress;
-    CREATE TABLE vnexpress (
-        id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
-        date TEXT,
-        title TEXT UNIQUE,
-        link TEXT,
-        description TEXT
-    )
-''')
+# # Create a table
+# cur.executescript('''
+#     DROP TABLE IF EXISTS vnexpress;
+#     CREATE TABLE vnexpress (
+#         id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
+#         date TEXT,
+#         title TEXT UNIQUE,
+#         link TEXT,
+#         description TEXT
+#     )
+# ''')
 
 def get_data(url):
     # Get the links to webpags and pass them to BeautifulSoup
